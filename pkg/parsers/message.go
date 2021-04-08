@@ -6,20 +6,17 @@ import (
 	"strings"
 )
 
+type MessageData struct {
+	name           string
+	topLevelFields map[string]string
+}
+
 func ParseError(lineIdx int) error {
 	return errors.New(fmt.Sprintf("Invalid line nr %d", lineIdx))
 }
 
 func InvalidTypeError(item string) error {
 	return errors.New(fmt.Sprintf("Not recognised type value %s", item))
-}
-
-func IsValidKey(key string) bool {
-	switch key {
-	case "Int", "String":
-		return true
-	}
-	return false
 }
 
 func ParseMessage(data string) (map[string]string, error) {
@@ -42,4 +39,23 @@ func ParseMessage(data string) (map[string]string, error) {
 
 	}
 	return parsedData, nil
+}
+
+func GoCodeGenFromMessage(message MessageData) string {
+	code := ""
+
+	// FIXME: Get a valid package name, this requires a plan for the project structure
+	code += "package %s \n"
+	code += "\n\n"
+
+	code += fmt.Sprintf("type %s struct {\n", message.name)
+
+	for key, value := range message.topLevelFields {
+		typeString, _ := ConvertTypeToGo(value)
+		code += fmt.Sprintf("\t%s %s\n", key, typeString)
+	}
+
+	code += "}"
+
+	return code
 }

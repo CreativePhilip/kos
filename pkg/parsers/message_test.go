@@ -30,3 +30,15 @@ func TestParseMessage(t *testing.T) {
 		}
 	}
 }
+
+func TestGoCodeGenFromMessage(t *testing.T) {
+	response, _ := ParseMessage(mockValidMessage())
+
+	msg := MessageData{
+		name:           "TestMsg",
+		topLevelFields: response,
+	}
+
+	code := GoCodeGenFromMessage(msg)
+	fmt.Println(code)
+}
